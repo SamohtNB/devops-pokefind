@@ -1,0 +1,20 @@
+{
+  "name": "devops-pokefind",
+  "version": "1.0.0",
+  "description": "The purpose of this project is to combine all the knowledge acquired in the course, and build a web app that serves a machine learning model, with all the associated CI/CD processes, versioning, and testing. Finally, the web app should be deployed to a cloud platform.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SamohtNB/devops-pokefind.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SamohtNB/devops-pokefind/issues"
+  },
+  "homepage": "https://github.com/SamohtNB/devops-pokefind#readme"
+}
