@@ -16,6 +16,19 @@ REQUESTS = Counter("app_requests_total", "Total HTTP requests", ["endpoint", "me
 # 1. Création de l’app
 app = FastAPI()
 
+@app.middleware("http")
+async def metrics_middleware(request, call_next):
+    response = await call_next(request)
+    REQUESTS.labels(endpoint=request.url.path,
+                    method=request.method,
+                    status=str(response.status_code)).inc()
+    return response
+
+@app.get("/metrics")
+def metrics():
+    return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
+
+
 # 2. Variables d’environnement
 MODEL_PATH = os.getenv("MODEL_PATH", "model.pth")
 RAW_DIR    = os.getenv("RAW_DIR", "data/raw")
