@@ -70,6 +70,11 @@ transform = transforms.Compose([
 class PredictRequest(BaseModel):
     image_path: str
 
+@app.get("/health")
+def health():
+    return {"status":"ok"}
+
+
 # 8. Endpoint de prédiction
 @app.post("/predict")
 def predict(req: PredictRequest):
