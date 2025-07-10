@@ -1,42 +1,69 @@
+import os
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-import mlflow.pytorch
-import torch
-import os
+from PIL import Image
 
+import torch
+import torch.nn as nn
+from torchvision import models, transforms
+
+# 1. Initialisation FastAPI
 app = FastAPI()
 
-# Charger le modèle depuis le Model Registry en production
-MODEL_URI = "models:/final-project/Production"
-model = mlflow.pytorch.load_model(MODEL_URI)
+# 2. Paramètres
+MODEL_PATH = os.getenv("MODEL_PATH", "model.pth")
+RAW_DIR    = os.getenv("RAW_DIR", "data/raw")  # dossier copié dans l'image
+device     = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+# 3. Détection automatique des classes
+if not os.path.isdir(RAW_DIR):
+    raise FileNotFoundError(f"Répertoire RAW_DIR introuvable : {RAW_DIR}")
+class_names = sorted(
+    d for d in os.listdir(RAW_DIR)
+    if os.path.isdir(os.path.join(RAW_DIR, d))
+)
+num_classes = len(class_names)
+print(f"Detected {num_classes} classes.")
+
+# 4. Chargement du modèle
+model = models.resnet18(pretrained=False)
+model.fc = nn.Linear(model.fc.in_features, num_classes)
+
+if not os.path.isfile(MODEL_PATH):
+    raise FileNotFoundError(f"Modèle introuvable : {MODEL_PATH}")
+state_dict = torch.load(MODEL_PATH, map_location=device)
+model.load_state_dict(state_dict)
+model.to(device)
 model.eval()
 
-# Classe pour la requête
-class PredictRequest(BaseModel):
-    # exemple : chemin local de l'image ou base64… adapte selon ton front
-    image_path: str
+# 5. Transformations d'entrée
+transform = transforms.Compose([
+    transforms.Resize(256),
+    transforms.CenterCrop(224),
+    transforms.ToTensor(),
+    transforms.Normalize([0.485, 0.456, 0.406],
+                         [0.229, 0.224, 0.225]),
+])
 
+# 6. Schéma de requête
+class PredictRequest(BaseModel):
+    image_path: str  # ou base64, à adapter selon ton front
+
+# 7. Endpoint de prédiction
 @app.post("/predict")
 def predict(req: PredictRequest):
-    # 1. Charger et transformer l'image
-    from PIL import Image
-    from torchvision import transforms
+    # Vérifie que le fichier existe
+    if not os.path.isfile(req.image_path):
+        raise HTTPException(status_code=400, detail="Image not found")
 
+    # Charge et transforme
     img = Image.open(req.image_path).convert("RGB")
-    tf = transforms.Compose([
-        transforms.Resize(256),
-        transforms.CenterCrop(224),
-        transforms.ToTensor(),
-        transforms.Normalize([0.485,0.456,0.406],[0.229,0.224,0.225])
-    ])
-    x = tf(img).unsqueeze(0)
+    x = transform(img).unsqueeze(0).to(device)
 
-    # 2. Prédiction
+    # Inférence
     with torch.no_grad():
         outputs = model(x)
         _, pred = torch.max(outputs, 1)
 
-    # 3. Retourner l’indice (ou le nom de la classe)
-    preds = model.metadata.get("class_names", None)
-    label = preds[pred.item()] if preds else str(pred.item())
+    label = class_names[pred.item()]
     return {"prediction": label}
