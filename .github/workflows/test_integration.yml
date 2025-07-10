@@ -1,0 +1,50 @@
+name: Integration Tests
+
+# Déclenchement sur push/PR et manuel
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:20.10.16-dind
+        options: --privileged
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t final-project-backend .
+
+      - name: Start container
+        run: |
+          docker run -d --name integration-backend -p 8000:8000 final-project-backend
+          # Laisse le temps à FastAPI de démarrer
+          sleep 8
+
+      - name: Test /health endpoint
+        run: |
+          curl --retry 5 --retry-delay 2 --fail http://localhost:8000/health
+
+      - name: Test /predict endpoint
+        run: |
+          # Envoie une requête POST et vérifie que la sortie contient le label "Abra"
+          RESPONSE=$(curl -s -X POST http://localhost:8000/predict \
+            -H "Content-Type: application/json" \
+            -d '{"image_path":"/app/data/raw/Abra/abra_001.jpg"}')
+          echo "Response: $RESPONSE"
+          if [[ "$RESPONSE" != *"Abra"* ]]; then
+            echo "❌ Predict endpoint returned unexpected result"
+            exit 1
+          fi
+
+      - name: Tear down
+        if: always()
+        run: docker rm -f integration-backend
