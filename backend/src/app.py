@@ -43,6 +43,16 @@ state_dict = torch.load(
     map_location=device,
     weights_only=False
 )
+
+first_key = next(iter(state_dict))
+if first_key.startswith("_orig_mod."):
+    new_dict = {
+        k.replace("_orig_mod.", ""): v
+        for k, v in state_dict.items()
+    }
+    state_dict = new_dict
+
+# 2) On peut charger en mode strict
 model.load_state_dict(state_dict)
 model.to(device)
 model.eval()
