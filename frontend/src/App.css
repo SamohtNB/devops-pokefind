@@ -1,38 +1,98 @@
-.App {
+/* App.css */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+:root {
+  --primary-color: #6366f1;
+  --primary-hover: #4f46e5;
+  --background-gradient: linear-gradient(135deg, #e0e7ff 0%, #f0f9ff 100%);
+  --card-bg: #ffffff;
+  --text-color: #1f2937;
+  --error-color: #dc2626;
+  --success-color: #16a34a;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
+  background: var(--background-gradient);
+  color: var(--text-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.app-container {
+  background: var(--card-bg);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  padding: 2rem;
+  max-width: 400px;
+  width: 100%;
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.app-container h1 {
+  margin-bottom: 1rem;
+  font-weight: 600;
+  font-size: 1.75rem;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.file-input {
+  display: block;
+  width: 100%;
+  margin: 1rem 0;
+  padding: 0.5rem;
+  border: 2px dashed var(--primary-color);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.file-input:hover {
+  background: rgba(99,102,241,0.1);
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.preview-image {
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  border: 1px solid #e5e7eb;
 }
 
-.App-link {
-  color: #61dafb;
+.btn-predict {
+  display: inline-block;
+  background: var(--primary-color);
+  color: #fff;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  width: 100%;
+}
+.btn-predict:hover {
+  background: var(--primary-hover);
+}
+.btn-predict:active {
+  transform: scale(0.97);
+}
+.btn-predict:disabled {
+  background: #a5b4fc;
+  cursor: not-allowed;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.result {
+  margin-top: 1rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--success-color);
+}
+
+.error {
+  margin-top: 1rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--error-color);
 }
