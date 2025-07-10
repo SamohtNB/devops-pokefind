@@ -8,6 +8,10 @@ import torch.nn as nn
 import torch.serialization
 import numpy as np
 from torchvision import models, transforms
+from prometheus_client import Counter, generate_latest, CONTENT_TYPE_LATEST
+
+# Compteurs
+REQUESTS = Counter("app_requests_total", "Total HTTP requests", ["endpoint", "method", "status"])
 
 # 1. Création de l’app
 app = FastAPI()
