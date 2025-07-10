@@ -24,7 +24,7 @@ ENV MLFLOW_TRACKING_USERNAME=Marco2a94
 # ENV MLFLOW_TRACKING_PASSWORD=ton_token_dagshub
 
 # Copie du modèle entraîné dans l'image
-COPY model.pth .
+COPY /backend/src/model.pth .
 
 # 7. Commande de lancement de l’app FastAPI
 CMD ["uvicorn", "src.app:app", "--host", "0.0.0.0", "--port", "8000"]
