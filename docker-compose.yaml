@@ -1,0 +1,32 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: backend
+    ports:
+      - "8000:8000"
+    networks:
+      - app-net
+    volumes:
+      - ./backend/src/model.pth:/app/model.pth:ro
+    environment:
+      - MODEL_PATH=/app/model.pth
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: frontend
+      args:
+        REACT_APP_BACKEND_URL: "http://localhost:8000"
+    ports:
+      - "3000:80"
+    networks:
+      - app-net
+    depends_on:
+      - backend
+
+networks:
+  app-net:
+    driver: bridge
