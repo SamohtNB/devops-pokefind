@@ -2,22 +2,26 @@ services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: dockerfile
+      dockerfile: Dockerfile
     ports:
       - "3000:80"               # hôte:conteneur
     environment:
       - HOST_PORT=3000          # pour l’echo dans le container
       - PORT=80
     restart: unless-stopped
+    networks:
+      - frontend-backend
 
   backend:
     build:
       context: ./backend
-      dockerfile: dockerfile
+      dockerfile: Dockerfile
     ports:
       - "8000:8000"               # hôte:conteneur
     environment:
       - MODEL_PATH = src/model.pth
       - RAW_DIR = data/raw
     volumes:
-      - ./data/raw:/app/data/raw 
+      - ./data/raw:/app/data/raw
+    networks:
+      - frontend-backend
