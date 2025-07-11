@@ -1,0 +1,11 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"               # hôte:conteneur
+    environment:
+      - HOST_PORT=3000          # pour l’echo dans le container
+      - PORT=80
+    restart: unless-stopped
