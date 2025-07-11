@@ -8,25 +8,24 @@ services:
       - "8000:8000"
     networks:
       - app-net
-    depends_on:
-      - frontend
     volumes:
-      - ./data/raw:/app/data/raw:ro
-      - ./backend/model.pth:/app/model.pth:ro
+      - ./backend/src/model.pth:/app/model.pth:ro
     environment:
-      - FRONTEND_URL=http://frontend:80
       - MODEL_PATH=/app/model.pth
-      - RAW_DIR=/app/data/raw
 
   frontend:
     build:
       context: .
       dockerfile: Dockerfile
       target: frontend
+      args:
+        REACT_APP_BACKEND_URL: "http://localhost:8000"
     ports:
       - "3000:80"
     networks:
       - app-net
+    depends_on:
+      - backend
 
 networks:
   app-net:
