@@ -1,12 +1,6 @@
-node_modules
-
+**/__pycache__/
+**/*.pyc
+backend/.venv
+frontend/node_modules
 .git
-.gitignore
-
-.dvc
-
-data/raw/
-
 .env
-
-mlruns
