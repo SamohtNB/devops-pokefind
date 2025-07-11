@@ -1,4 +1,5 @@
 version: '3.8'
+
 services:
   backend:
     build:
@@ -9,21 +10,25 @@ services:
       - "8000:8000"
     networks:
       - app-net
+    # Monte le dossier data/raw de la racine dans /app/data/raw du conteneur
+    volumes:
+      - ./data/raw:/app/data/raw:ro
     environment:
       - FRONTEND_URL=http://frontend:80
+      - MODEL_PATH=/app/model.pth
+      - RAW_DIR=/app/data/raw
 
   frontend:
     build:
       context: .
       dockerfile: Dockerfile
-      target: nginx   # on utilise le stage “nginx” pour servir le build React
+      target: nginx
     ports:
       - "3000:80"
     networks:
       - app-net
     depends_on:
-      - ba
-    
+      - backend
 
 networks:
   app-net:
