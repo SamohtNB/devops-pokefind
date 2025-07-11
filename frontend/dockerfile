@@ -1,0 +1,23 @@
+# Étape 1 : build de l'app React
+FROM node:18-alpine AS build
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+
+# Étape 2 : serveur Nginx pour la prod
+FROM nginx:alpine
+
+# 1) Copier le build React
+COPY --from=build /app/build /usr/share/nginx/html
+
+# 2) Copier et rendre exécutable votre script d'entrypoint
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# 3) Exposer le port interne (80 par défaut)
+EXPOSE 80
+
+# 4) Définir l’entrypoint pour afficher le port puis lancer Nginx
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
