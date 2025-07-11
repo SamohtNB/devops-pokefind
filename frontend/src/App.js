@@ -27,7 +27,9 @@ function App() {
     try {
       const formData = new FormData();
       formData.append('file', file);
-      const res = await fetch('http://localhost:8000/predict/', {
+      // utilise la variable d'env ou localhost en dev
+      const base = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
+      const res = await fetch(`${base}/predict/`, {
         method: 'POST',
         body: formData,
       });
