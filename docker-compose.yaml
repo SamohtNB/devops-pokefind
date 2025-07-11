@@ -1,27 +1,30 @@
+version: '3.8'
 services:
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    ports:
-      - "3000:80"               # hôte:conteneur
-    environment:
-      - HOST_PORT=3000          # pour l’echo dans le container
-      - PORT=80
-    restart: unless-stopped
-    networks:
-      - frontend-backend
-
   backend:
     build:
-      context: ./backend
+      context: .
       dockerfile: Dockerfile
+      target: backend
     ports:
-      - "8000:8000"               # hôte:conteneur
-    environment:
-      - MODEL_PATH = src/model.pth
-      - RAW_DIR = data/raw
-    volumes:
-      - ./data/raw:/app/data/raw
+      - "8000:8000"
     networks:
-      - frontend-backend
+      - app-net
+    environment:
+      - FRONTEND_URL=http://frontend:80
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: nginx   # on utilise le stage “nginx” pour servir le build React
+    ports:
+      - "3000:80"
+    networks:
+      - app-net
+    depends_on:
+      - ba
+    
+
+networks:
+  app-net:
+    driver: bridge
